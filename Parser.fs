@@ -65,9 +65,18 @@ let andCond = infixCond "&&" AndCond
 
 condRef := andCond <|> varCond
 
-
-
 let condition = spaces >>. between (pstring "[") (pstring "]") cond
+
+// Comments
+
+let lineComment = pstring "//" >>. restOfLine true
+let blockComment =
+    between
+        (pstring "/*")
+        (pstring "*/")
+        (charsTillString "*/" false System.Int32.MaxValue)
+
+let comment = skipMany <| (lineComment <|> blockComment)
 
 let statement =
     variable .>>. stringlit .>>. condition
@@ -76,3 +85,4 @@ let statement =
 let testVar s = test variable s
 let testStatement s = test statement s
 let testString s = test stringlit s
+let testComment s = test comment s
