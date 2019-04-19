@@ -1,10 +1,9 @@
-open FParsec
 open System
 
 open QPC.Parser
 
 [<EntryPoint>]
 let main argv =
-    test pfloat "0.132"
-
+    testVar "$132"
+    testStatement "$Include [$POSIX && $OSX64]"
     0

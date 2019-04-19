@@ -9,4 +9,14 @@ be built as a library and used as the parser frontend for other generators.
 
 ## Status
 
-Literally nothing has been written yet
+Done
+- statements
+- variables
+- conditions
+    - $var
+    - &&
+In Progress
+- strings
+    - $Include "this is a string"
+- blocks
+    - $Configuration { ... }
