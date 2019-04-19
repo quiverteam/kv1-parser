@@ -1,0 +1,3 @@
+remote_theme: pmarsceill/just-the-docs
+title: "QPC Parser"
+description: ".NET library for parsing QPC files written in F#"
