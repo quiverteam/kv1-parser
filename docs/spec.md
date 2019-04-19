@@ -1,3 +1,9 @@
+---
+title: Spec
+permalink: /spec
+layout: default
+nav_order: 2
+---
 # QPC Spec
 
 This page provides a specification of the QPC file format. It is largely based on
