@@ -2,7 +2,6 @@
 title: Spec
 permalink: /spec
 layout: default
-nav_order: 2
 ---
 # QPC Spec
 
