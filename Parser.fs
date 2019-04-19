@@ -31,7 +31,7 @@ type Condition = AndCond of (Condition * Condition)
                | EmptyCond
 
 
-type Syntax = Statement of (string * Condition)
+type Syntax = Statement of (string * string * Condition)
             | Block     of (string * Syntax)
 
 // let ws1 = many1 <| anyOf " \t"
@@ -43,7 +43,11 @@ let paddedStr s = spaces >>. stringReturn s s .>> spaces
 // very old macs, but I'm not worried about that.
 // let nlPadded = many (anyOf " \t\r") .>> pstring "\n"
 
-let variable = pstring "$" >>. regex "([a-zA-Z0-9_\-]+)" .>> spaces
+let variable = spaces >>. pstring "$" >>. regex "([a-zA-Z0-9_\-]+)" .>> spaces
+
+let stringlit =
+    spaces >>. between (pstring "\"") (pstring "\"")
+        (manyChars (noneOf "\"\r\n"))
 
 // Condition parsers. They parse conditions in square brackets. e.g:
 // [$foo && $bar || $baz]
@@ -65,7 +69,10 @@ condRef := andCond <|> varCond
 
 let condition = spaces >>. between (pstring "[") (pstring "]") cond
 
-let statement = variable .>>. condition |>> Statement 
+let statement =
+    variable .>>. stringlit .>>. condition
+    |>> (fun ((x, y), z) -> Statement(x, y, z))
 
 let testVar s = test variable s
 let testStatement s = test statement s
+let testString s = test stringlit s
