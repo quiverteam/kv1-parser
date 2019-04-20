@@ -36,7 +36,7 @@ type Syntax = Statement of (string * string * Condition)
 
 // let ws1 = many1 <| anyOf " \t"
 
-let paddedStr s = spaces >>. stringReturn s s .>> spaces
+let str_ws s = pstring s >>. spaces
 
 // Newlines **must** end in an NL char, an arbitrary number of CRs is allowed
 // before, but there must be an NL at the end. Might break support on very,
@@ -51,19 +51,21 @@ let stringlit =
 
 // Condition parsers. They parse conditions in square brackets. e.g:
 // [$foo && $bar || $baz]
-//
 
-let cond, condRef = createParserForwardedToRef<Condition, unit>()
+let opp = new OperatorPrecedenceParser<Condition, unit, unit>()
+let cond = opp.ExpressionParser
 
 let varCond = variable |>> DefCond
 
+let term = attempt varCond <|> between (str_ws "(") (str_ws ")") cond
+opp.TermParser <- term
 
-let infixStr s T = pstring s >>% (fun x y -> T(x, y))
-let infixCond s T = chainl1 varCond (infixStr s T)
+type Asc = Associativity
 
-let andCond = infixCond "&&" AndCond
+let addInfix a T = opp.AddOperator(InfixOperator(a, spaces, 1, Asc.Left, fun x y -> T(x, y)))
 
-condRef := andCond <|> varCond
+addInfix "&&" AndCond
+addInfix "||" OrCond
 
 let condition = spaces >>. between (pstring "[") (pstring "]") cond
 
@@ -97,3 +99,4 @@ let testVar       s = test variable s
 let testStatement s = test statement s
 let testString    s = test stringlit s
 let testComment   s = test comment s
+let testCond      s = test condition s
