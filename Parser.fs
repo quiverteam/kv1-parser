@@ -58,7 +58,7 @@ let cond, condRef = createParserForwardedToRef<Condition, unit>()
 let varCond = variable |>> DefCond
 
 
-let infixStr s T = pstring s .>> spaces >>% (fun x y -> T(x, y))
+let infixStr s T = pstring s >>% (fun x y -> T(x, y))
 let infixCond s T = chainl1 varCond (infixStr s T)
 
 let andCond = infixCond "&&" AndCond
@@ -76,12 +76,12 @@ let blockComment =
         (pstring "*/")
         (charsTillString "*/" false System.Int32.MaxValue)
 
-let comment = skipMany <| (lineComment <|> blockComment)
+let comment = lineComment <|> blockComment |> skipMany
 
 // Syntax rules
 
 let conditionalStatement =
-    (variable .>>. stringlit .>>.? condition)
+    variable .>>. stringlit .>>.? condition
     |> attempt
     |>> fun ((x, y), z) -> Statement(x, y, z)
 
@@ -89,8 +89,9 @@ let unconditionalStatement =
     variable .>>. stringlit
     |>> fun (x, y) -> Statement(x, y, EmptyCond)
 
-let statement = conditionalStatement
-             <|>unconditionalStatement
+let statement =
+        conditionalStatement
+    <|> unconditionalStatement
 
 let testVar       s = test variable s
 let testStatement s = test statement s
