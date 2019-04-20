@@ -78,11 +78,21 @@ let blockComment =
 
 let comment = skipMany <| (lineComment <|> blockComment)
 
-let statement =
-    variable .>>. stringlit .>>. condition
-    |>> (fun ((x, y), z) -> Statement(x, y, z))
+// Syntax rules
 
-let testVar s = test variable s
+let conditionalStatement =
+    (variable .>>. stringlit .>>.? condition)
+    |> attempt
+    |>> fun ((x, y), z) -> Statement(x, y, z)
+
+let unconditionalStatement =
+    variable .>>. stringlit
+    |>> fun (x, y) -> Statement(x, y, EmptyCond)
+
+let statement = conditionalStatement
+             <|>unconditionalStatement
+
+let testVar       s = test variable s
 let testStatement s = test statement s
-let testString s = test stringlit s
-let testComment s = test comment s
+let testString    s = test stringlit s
+let testComment   s = test comment s
