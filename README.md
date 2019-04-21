@@ -12,12 +12,13 @@ be built as a library and used as the parser frontend for other generators.
 Done
 - statements
 - variables
+- strings
 - conditions
     - $var
     - &&
+    - ||
+    - ()
 
 In Progress
-- strings
-    - $Include "this is a string"
 - blocks
     - $Configuration { ... }
