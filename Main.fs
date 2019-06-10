@@ -11,4 +11,6 @@ let main argv =
     testCond "[$FOO && $BAR && $BAZ]"
     testString """ "This is a string" """
     testComment "// This is a comment \n/* Block Comment */"
+    testKey """ "hello world" """
+    testKey "Nice"
     0

@@ -43,11 +43,15 @@ let str_ws s = pstring s >>. spaces
 // very old macs, but I'm not worried about that.
 // let nlPadded = many (anyOf " \t\r") .>> pstring "\n"
 
-let variable = spaces >>. pstring "$" >>. regex "([a-zA-Z0-9_\-]+)" .>> spaces
+let variable = spaces >>. regex "([\$a-zA-Z0-9_\-]+)" .>> spaces
 
 let stringlit =
     spaces >>. between (pstring "\"") (pstring "\"")
         (manyChars (noneOf "\"\r\n"))
+
+// eat the spaces here so that the parser doesnt have to backtrack after
+// variable matches whitespace
+let key = spaces >>. (variable <|> stringlit)
 
 // Condition parsers. They parse conditions in square brackets. e.g:
 // [$foo && $bar || $baz]
@@ -55,7 +59,7 @@ let stringlit =
 let opp = new OperatorPrecedenceParser<Condition, unit, unit>()
 let cond = opp.ExpressionParser
 
-let varCond = variable |>> DefCond
+let varCond = key |>> DefCond
 
 let term = attempt varCond <|> between (str_ws "(") (str_ws ")") cond
 opp.TermParser <- term
@@ -83,12 +87,12 @@ let comment = lineComment <|> blockComment |> skipMany
 // Syntax rules
 
 let conditionalStatement =
-    variable .>>. stringlit .>>.? condition
+    key .>>. key .>>.? condition
     |> attempt
     |>> fun ((x, y), z) -> Statement(x, y, z)
 
 let unconditionalStatement =
-    variable .>>. stringlit
+    key .>>. key
     |>> fun (x, y) -> Statement(x, y, EmptyCond)
 
 let statement =
@@ -100,3 +104,4 @@ let testStatement s = test statement s
 let testString    s = test stringlit s
 let testComment   s = test comment s
 let testCond      s = test condition s
+let testKey       s = test key s
