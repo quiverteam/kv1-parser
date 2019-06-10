@@ -1,7 +1,7 @@
-# QPC Parser
+# KeyValues Parser
 
-An F# implementation of a parser for the QPC/VPC file format. Should
-be built as a library and used as the parser frontend for other generators.
+An F# implementation of a parser for the KeyValues file format. Used in QPC
+to parse qpc and qgc files.
 
 ## Dependencies
 
@@ -9,16 +9,18 @@ be built as a library and used as the parser frontend for other generators.
 
 ## Status
 
-Done
+### Done
+
 - statements
 - variables
 - strings
 - conditions
-    - $var
-    - &&
-    - ||
-    - ()
+  - $var
+  - &&
+  - ||
+  - ()
 
-In Progress
+###In Progress
+
 - blocks
-    - $Configuration { ... }
+  - $Configuration { ... }
