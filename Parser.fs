@@ -106,7 +106,7 @@ let statement =
         conditionalStatement
     <|> unconditionalStatement
 
-do keyValuesRef := statement
+do keyValuesRef := statement .>> spaces
 
 let testVar       s = test variable s
 let testStatement s = test statement s
@@ -115,3 +115,8 @@ let testComment   s = test comment s
 let testCond      s = test condition s
 let testKey       s = test key s
 let testBlock     s = test block s
+
+
+// le chad actuall KeyValues parser
+
+let parseKeyValues s = run keyValues s

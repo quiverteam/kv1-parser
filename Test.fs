@@ -14,4 +14,10 @@ let main argv =
     testKey """ "hello world" """
     testKey "Nice"
     testBlock """ { foo bar } """
+    testStatement """
+    $Configuration
+    {
+        $Include "windows.h" [$WINDOWS]
+        $Include "posix.h" [$OSX || $LINUX]
+    }"""
     0
