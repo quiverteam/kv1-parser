@@ -8,7 +8,7 @@
 
   <ItemGroup>
     <Compile Include="Parser.fs" />
-    <Compile Include="Main.fs" />
+    <Compile Include="Test.fs" />
   </ItemGroup>
 
   <ItemGroup>

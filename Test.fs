@@ -1,6 +1,6 @@
 open System
 
-open QPC.Parser
+open KeyValues.Parser
 
 [<EntryPoint>]
 let main argv =

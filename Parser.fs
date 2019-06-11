@@ -1,11 +1,11 @@
 //
-// Parser for the QPC/VPC file format. github.com/quiverteam/qpc-parser
+// Parser for the KeyValues file format. github.com/quiverteam/qpc-parser
 //
 
-module QPC.Parser
+module KeyValues.Parser
 
 open FParsec
-open System
+open System.Collections.Generic
 
 
 
@@ -30,11 +30,13 @@ type Condition = AndCond of (Condition * Condition)
                // Always true, used if empty or no conditions provided.
                | EmptyCond
 
+type Value = StringValue of string
+           | BlockValue of Syntax list
 
-type Syntax = Statement of (string * string * Condition)
-            | Block     of (string * Syntax)
+and Syntax = Statement of (string * Value * Condition)
 
-// let ws1 = many1 <| anyOf " \t"
+let keyValues, keyValuesRef = createParserForwardedToRef<Syntax, unit>()
+
 
 let str_ws s = pstring s >>. spaces
 
@@ -49,9 +51,13 @@ let stringlit =
     spaces >>. between (pstring "\"") (pstring "\"")
         (manyChars (noneOf "\"\r\n"))
 
+let block = pstring "{" >>. spaces >>. many keyValues .>> spaces .>> pstring "}" |>> BlockValue
+
 // eat the spaces here so that the parser doesnt have to backtrack after
 // variable matches whitespace
-let key = spaces >>. (variable <|> stringlit)
+let keyString = spaces >>. (variable <|> stringlit)
+let key = keyString |>> StringValue
+let value = spaces >>. (key <|> block)
 
 // Condition parsers. They parse conditions in square brackets. e.g:
 // [$foo && $bar || $baz]
@@ -59,14 +65,15 @@ let key = spaces >>. (variable <|> stringlit)
 let opp = new OperatorPrecedenceParser<Condition, unit, unit>()
 let cond = opp.ExpressionParser
 
-let varCond = key |>> DefCond
+let varCond = keyString |>> DefCond
 
 let term = attempt varCond <|> between (str_ws "(") (str_ws ")") cond
 opp.TermParser <- term
 
 type Asc = Associativity
 
-let addInfix a T = opp.AddOperator(InfixOperator(a, spaces, 1, Asc.Left, fun x y -> T(x, y)))
+let addInfix a T =
+     opp.AddOperator(InfixOperator(a, spaces, 1, Asc.Left, fun x y -> T(x, y)))
 
 addInfix "&&" AndCond
 addInfix "||" OrCond
@@ -87,12 +94,12 @@ let comment = lineComment <|> blockComment |> skipMany
 // Syntax rules
 
 let conditionalStatement =
-    key .>>. key .>>.? condition
+    keyString .>>. value .>>.? condition
     |> attempt
     |>> fun ((x, y), z) -> Statement(x, y, z)
 
 let unconditionalStatement =
-    key .>>. key
+    keyString .>>. value
     |>> fun (x, y) -> Statement(x, y, EmptyCond)
 
 let statement =
