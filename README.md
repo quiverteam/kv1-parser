@@ -9,18 +9,25 @@ to parse qpc and qgc files.
 
 ## Status
 
-### Done
+The full kv1 spec parses. Here's a stress test of what it can parse:
 
-- statements
-- variables
-- strings
-- conditions
-  - $var
-  - &&
-  - ||
-  - ()
+```pl
+$Configuration
+{
+    $Include "windows.h" [$WINDOWS]
+    $Include "posix.h" [$OSX || ($LINUX && $POSIX)]
+}
+```
 
-###In Progress
+Which parses successfully to this F# representation of the data:
 
-- blocks
-  - $Configuration { ... }
+```fs
+Statement
+  ("$Configuration",
+   BlockValue
+     [Statement ("$Include", StringValue "windows.h", DefCond "$WINDOWS");
+      Statement
+        ("$Include", StringValue "posix.h",
+         OrCond (DefCond "$OSX", AndCond (DefCond "$LINUX", DefCond "$POSIX")))],
+   EmptyCond)
+```

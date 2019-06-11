@@ -18,6 +18,6 @@ let main argv =
     $Configuration
     {
         $Include "windows.h" [$WINDOWS]
-        $Include "posix.h" [$OSX || $LINUX]
+        $Include "posix.h" [$OSX || ($LINUX && $POSIX)]
     }"""
     0

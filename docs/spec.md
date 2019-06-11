@@ -34,8 +34,8 @@ fulfilled in order for the preceeding KV pair to be included.
 ```pl
 key "included if $WINDOWS is defined" [$WINDOWS]
 key "included if $POSIX OR $OSX is defined" [$POSIX || $OSX]
-key "included if $FOO AND ($BAR OR $BAZ) are defined" [$FOO && $BAR || $BAZ]
-key "included if ($FOO AND $BAR) OR $BAZ are defined" [($FOO && $BAR) || $BAZ]
+key "included if ($FOO AND $BAR) OR $BAZ)] are defined" [$FOO && $BAR || $BAZ]
+key "included if $FOO AND ($BAR OR $BAZ) are defined" [$FOO && ($BAR || $BAZ)]
 ```
 
 ## Comments
