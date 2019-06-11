@@ -13,4 +13,5 @@ let main argv =
     testComment "// This is a comment \n/* Block Comment */"
     testKey """ "hello world" """
     testKey "Nice"
+    testBlock """ { foo bar } """
     0

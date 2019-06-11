@@ -51,7 +51,7 @@ let stringlit =
     spaces >>. between (pstring "\"") (pstring "\"")
         (manyChars (noneOf "\"\r\n"))
 
-let block = pstring "{" >>. spaces >>. many keyValues .>> spaces .>> pstring "}" |>> BlockValue
+let block = spaces >>. pstring "{" >>. spaces >>. many keyValues .>> spaces .>> pstring "}" |>> BlockValue
 
 // eat the spaces here so that the parser doesnt have to backtrack after
 // variable matches whitespace
@@ -106,9 +106,12 @@ let statement =
         conditionalStatement
     <|> unconditionalStatement
 
+do keyValuesRef := statement
+
 let testVar       s = test variable s
 let testStatement s = test statement s
 let testString    s = test stringlit s
 let testComment   s = test comment s
 let testCond      s = test condition s
 let testKey       s = test key s
+let testBlock     s = test block s
